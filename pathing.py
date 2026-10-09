@@ -60,7 +60,10 @@ def get_random_path():
     path_to_end = get_segment_path_random(current_graph, target, end)
 
     # Remove the duplicate target node from path_2
-    return path_to_target + path_to_end[1:]
+    full_path = path_to_target + path_to_end[1:]
+
+    # Assert postconditions and return
+    return verify_postconditions(full_path, current_graph, target, end)
 
 
 def get_segment_path_dfs(graph, start, goal):
@@ -113,7 +116,10 @@ def get_dfs_path():
     path_to_end = get_segment_path_dfs(current_graph, target, end)
 
     # Remove the duplicate target node from path_2
-    return path_to_target + path_to_end[1:]
+    full_path = path_to_target + path_to_end[1:]
+
+    # Assert postconditions and return
+    return verify_postconditions(full_path, current_graph, target, end)
     
 
 def get_segment_path_bfs(graph, start, goal):
@@ -162,9 +168,11 @@ def get_bfs_path():
     path_to_target = get_segment_path_bfs(current_graph, start, target)
     path_to_end = get_segment_path_bfs(current_graph, target, end)
 
-
     # Remove the duplicate target node from path_2
-    return path_to_target + path_to_end[1:]
+    full_path = path_to_target + path_to_end[1:]
+
+    # Assert postconditions and return
+    return verify_postconditions(full_path, current_graph, target, end)
 
 
 def get_dijkstra_path():
