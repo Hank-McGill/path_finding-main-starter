@@ -162,9 +162,24 @@ def get_bfs_path():
     path_to_target = get_segment_path_bfs(current_graph, start, target)
     path_to_end = get_segment_path_bfs(current_graph, target, end)
 
+
     # Remove the duplicate target node from path_2
     return path_to_target + path_to_end[1:]
 
 
 def get_dijkstra_path():
     return [1,2]
+
+
+def verify_postconditions(path, graph, target, goal):
+    # Postcondition a: Result path includes target node
+    assert target in path, f"Target node {target} is missing from the path"
+    
+    # Postcondition b: Result path ends at goal node
+    assert path[-1] == goal, f"Path ends at {path[-1]}, expected goal node {goal}"
+    
+    # Postcondition c: Every pair of sequential vertices in the path are connected by an edge
+    for i in range(len(path) - 1):
+        first_node = path[i]
+        next_node = path[i + 1]
+        assert next_node in graph[first_node][1], f"No edge exists between node {first_node} and node {next_node}."
