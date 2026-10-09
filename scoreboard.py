@@ -65,10 +65,14 @@ class Scoreboard:
                                             batch=batch, group=group,
                                             color=player[2][colors.TEXT_INDEX])
             self.player_nodes_visited_display.append((nodes_label, player))
-            
-            
+
+            self.winner_label = pyglet.text.Label('Winner: None', x=0, y=0,
+                                                  font_name='Arial', font_size=self.font_size,
+                                                  batch=batch, group=group, color=(0, 255, 0, 255))
 
     def update_elements_locations(self):
+        self.winner_label.x = config_data.window_width - self.stat_width
+        self.winner_label.y = config_data.window_height - self.base_height_offset
         self.distance_to_exit_label.x = config_data.window_width - self.stat_width
         self.distance_to_exit_label.y = config_data.window_height - self.stat_height;
         for index, (display_element, player) in enumerate(self.player_name_display):
@@ -121,6 +125,34 @@ class Scoreboard:
                     path_len = len(global_game_data.graph_paths[player_object.player_index])
                     display_element.text = f"Nodes Visited: {path_len}" 
 
+    def calculate_path_length(self, path):
+        if not path or len(path) < 2:
+            return float('inf')
+        graph = graph_data.graph_data[global_game_data.current_graph_index]
+        total_dist = 0.0
+        for i in range(len(path) - 1):
+            u_pos = graph[path[i]][0]
+            v_pos = graph[path[i + 1]][0]
+            total_dist += math.dist(u_pos, v_pos)
+        return total_dist
+
+    def update_winner(self):
+        target_node = global_game_data.target_node[global_game_data.current_graph_index]
+        winning_player_name = "None"
+        shortest_distance = float('inf')
+
+        for player_object in global_game_data.player_objects:
+            path = global_game_data.graph_paths[player_object.player_index]
+
+            # Path must exist and must contain the target node
+            if path and target_node in path:
+                path_dist = self.calculate_path_length(path)
+                if path_dist < shortest_distance:
+                    shortest_distance = path_dist
+                    winning_player_name = player_object.player_config_data[0]
+
+        self.winner_label.text = f"Winner : {winning_player_name}"
+
 
     def update_scoreboard(self):
         self.update_elements_locations()
@@ -128,3 +160,4 @@ class Scoreboard:
         self.update_distance_to_exit()
         self.update_distance_traveled()
         self.update_nodes_visited_count() # New stat
+        self.update_winner() # New visual
