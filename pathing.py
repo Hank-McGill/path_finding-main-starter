@@ -191,3 +191,5 @@ def verify_postconditions(path, graph, target, goal):
         first_node = path[i]
         next_node = path[i + 1]
         assert next_node in graph[first_node][1], f"No edge exists between node {first_node} and node {next_node}."
+
+    return path
