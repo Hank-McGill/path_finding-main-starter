@@ -11,13 +11,14 @@ class Scoreboard:
     player_traveled_display = []
     player_excess_distance_display = []
     player_path_display = []
+    player_nodes_visited_display = []
 
     def __init__(self, batch, group):
         self.batch = batch
         self.group = group
         self.stat_height = 32
         self.stat_width = 400
-        self.number_of_stats = 5
+        self.number_of_stats = 6
         self.base_height_offset = 20
         self.font_size = 16
         self.distance_to_exit_label = pyglet.text.Label('Direct Distance To Exit : 0', x=0, y=0,
@@ -30,6 +31,7 @@ class Scoreboard:
                                                   font_name='Arial',
                                                   font_size=self.font_size, batch=batch, group=group, color=player[2][colors.TEXT_INDEX])
             self.player_name_display.append((player_name_label, player))
+
             traveled_distance_label = pyglet.text.Label("Distance Traveled:",
                                                         x=0,
                                                         y=0,
@@ -37,6 +39,7 @@ class Scoreboard:
                                                         font_size=self.font_size, batch=batch, group=group, color=player[2][colors.TEXT_INDEX])
             self.player_traveled_display.append(
                 (traveled_distance_label, player))
+            
             excess_distance_label = pyglet.text.Label("Excess Distance Traveled:",
                                                       x=0,
                                                       y=0,
@@ -45,6 +48,7 @@ class Scoreboard:
 
             self.player_excess_distance_display.append(
                 (excess_distance_label, player))
+            
             path_label = pyglet.text.Label("",
                                    x=0,
                                    y=0,
@@ -52,6 +56,17 @@ class Scoreboard:
                                    font_size=self.font_size, batch=batch, group=group, color=player[2][colors.TEXT_INDEX])
             self.player_path_display.append(
                 (path_label, player))
+            
+            nodes_label = pyglet.text.Label("Nodes Visited: 0",
+                                            x=0,
+                                            y=0,
+                                            font_name='Arial',
+                                            font_size=self.font_size,
+                                            batch=batch, group=group,
+                                            color=player[2][colors.TEXT_INDEX])
+            self.player_nodes_visited_display.append((nodes_label, player))
+            
+            
 
     def update_elements_locations(self):
         self.distance_to_exit_label.x = config_data.window_width - self.stat_width
@@ -68,6 +83,9 @@ class Scoreboard:
         for index, (display_element, player) in enumerate(self.player_path_display):
             display_element.x = config_data.window_width - self.stat_width
             display_element.y = config_data.window_height - self.base_height_offset - self.stat_height * 5 - self.stat_height * (index * self.number_of_stats)
+        for index, (display_element, player) in enumerate(self.player_nodes_visited_display):
+            display_element.x = config_data.window_width - self.stat_width
+            display_element.y = config_data.window_height - self.base_height_offset - self.stat_height * 6 - self.stat_height * (index * self.number_of_stats)
 
     def update_paths(self):
         for index in range(len(config_data.player_data)):
@@ -96,8 +114,17 @@ class Scoreboard:
                 if player_object.player_config_data == player_configuration_info:
                     display_element.text = "Excess Distance Traveled: " + str(max(0, int(player_object.distance_traveled-self.distance_to_exit)))
 
+    def update_nodes_visited_count(self):
+        for display_element, player_configuration_info in self.player_nodes_visited_display:
+            for player_object in global_game_data.player_objects:
+                if player_object.player_config_data == player_configuration_info:
+                    path_len = len(global_game_data.graph_paths[player_object.player_index])
+                    display_element.text = f"Nodes Visited: {path_len}" 
+
+
     def update_scoreboard(self):
         self.update_elements_locations()
         self.update_paths()
         self.update_distance_to_exit()
         self.update_distance_traveled()
+        self.update_nodes_visited_count() # New stat
